@@ -76,28 +76,28 @@ model{
 
 
   for (i in 1:(Npar_0 + 1)) {
-    beta_0[i] ~ dnorm(0.0, 0.1)
+    beta_0[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 
   for (i in 1:Npar) {
-    beta_1[i] ~ dnorm(0.0, 0.1)
+    beta_1[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 
-  alpha_os.1 ~ dexp(0.5)
+  alpha_os.1 ~ dexp(alpha.prior)
 
-  lambda ~ dnorm(0, 0.1)
+  lambda ~ dnorm(0, lambda.prior.sd)
 
 
 
-  sigma_Y ~ dnorm(0, 1) T(0,)
+  sigma_Y ~ dnorm(0, y.prior.sd) T(0,)
 
-  sigma_b1 ~ dnorm(0, 1) T(0,)
+  sigma_b1 ~ dnorm(0, b.prior.sd) T(0,)
 
-  sigma_b2 ~ dnorm(0, 1) T(0,)
+  sigma_b2 ~ dnorm(0, b.prior.sd) T(0,)
 
-  sigma_os.1 ~ dnorm(0, 1) T(0,)
+  sigma_os.1 ~ dnorm(0, b.prior.sd) T(0,)
 
   rho ~ dunif(-1, 1)
 
@@ -197,21 +197,21 @@ model{
 
 
   for (i in 1:Npar) {
-    beta_2[i] ~ dnorm(0.0, 0.1)
+    beta_2[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
   for (i in 1:Npar) {
-    beta_os.2[i] ~ dnorm(0.0, 0.1)
+    beta_os.2[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
-  eta_2 ~ dexp(0.5)
+  eta_2 ~ dexp(eta.prior)
 
 
-  alpha_2 ~ dexp(1)
-  alpha_os.2 ~ dexp(1)
+  alpha_2 ~ dexp(alpha.prior)
+  alpha_os.2 ~ dexp(alpha.prior)
 
-  sigma_os.2 ~ dnorm(0, 1) T(0,)
-  sigma_nt.2 ~ dnorm(0, 1) T(0,)
+  sigma_os.2 ~ dnorm(0, b.prior.sd) T(0,)
+  sigma_nt.2 ~ dnorm(0, b.prior.sd) T(0,)
 
 
   ############################## New Lesion #######################################
@@ -307,23 +307,23 @@ model{
 
   for (i in 1:Npar)
   {
-    beta_3[i] ~ dnorm(0.0, 0.1)
+    beta_3[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
   for (i in 1:Npar)
   {
-    beta_os.3[i] ~ dnorm(0.0, 0.1)
+    beta_os.3[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
-  eta_3 ~ dexp(0.5)
+  eta_3 ~ dexp(eta.prior)
 
 
-  alpha_3 ~ dexp(1)
-  alpha_os.3 ~ dexp(1)
+  alpha_3 ~ dexp(alpha.prior)
+  alpha_os.3 ~ dexp(alpha.prior)
 
 
-  sigma_os.3 ~ dnorm(0, 1) T(0,)
-  sigma_nl.3 ~ dnorm(0, 1) T(0,)
+  sigma_os.3 ~ dnorm(0, b.prior.sd) T(0,)
+  sigma_nl.3 ~ dnorm(0, b.prior.sd) T(0,)
 
 
 
@@ -346,11 +346,11 @@ model{
 
   #### priors ####
 
-  alpha_os.4 ~ dexp(1)
+  alpha_os.4 ~ dexp(alpha.prior)
 
   for (i in 1:Npar)
   {
-    beta_os.4[i] ~ dnorm(0.0, 0.1)
+    beta_os.4[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 
@@ -437,28 +437,28 @@ model{
 
 
   for (i in 1:(Npar_0 + 1)) {
-    beta_0[i] ~ dnorm(0.0, 0.1)
+    beta_0[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 
   for (i in 1:Npar) {
-    beta_1[i] ~ dnorm(0.0, 0.1)
+    beta_1[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 
-  alpha_os.1 ~ dexp(0.5)
+  alpha_os.1 ~ dexp(alpha.prior)
 
-  lambda ~ dnorm(0, 0.1)
+  lambda ~ dnorm(0, lambda.prior.sd)
 
 
 
-  sigma_Y ~ dnorm(0, 1) T(0,)
+  sigma_Y ~ dnorm(0, y.prior.sd) T(0,)
 
-  sigma_b1 ~ dnorm(0, 1) T(0,)
+  sigma_b1 ~ dnorm(0, b.prior.sd) T(0,)
 
-  sigma_b2 ~ dnorm(0, 1) T(0,)
+  sigma_b2 ~ dnorm(0, b.prior.sd) T(0,)
 
-  sigma_os.1 ~ dnorm(0, 1) T(0,)
+  sigma_os.1 ~ dnorm(0, b.prior.sd) T(0,)
 
   rho ~ dunif(-1, 1)
 
@@ -558,21 +558,21 @@ model{
 
 
   for (i in 1:Npar) {
-    beta_2[i] ~ dnorm(0.0, 0.1)
+    beta_2[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
   for (i in 1:Npar) {
-    beta_os.2[i] ~ dnorm(0.0, 0.1)
+    beta_os.2[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
-  eta_2 ~ dexp(0.5)
+  eta_2 ~ dexp(eta.prior)
 
 
-  alpha_2 ~ dexp(1)
-  alpha_os.2 ~ dexp(1)
+  alpha_2 ~ dexp(alpha.prior)
+  alpha_os.2 ~ dexp(alpha.prior)
 
-  sigma_os.2 ~ dnorm(0, 1) T(0,)
-  sigma_nt.2 ~ dnorm(0, 1) T(0,)
+  sigma_os.2 ~ dnorm(0, b.prior.sd) T(0,)
+  sigma_nt.2 ~ dnorm(0, b.prior.sd) T(0,)
 
 
   ############################## New Lesion #######################################
@@ -668,23 +668,23 @@ model{
 
   for (i in 1:Npar)
   {
-    beta_3[i] ~ dnorm(0.0, 0.1)
+    beta_3[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
   for (i in 1:Npar)
   {
-    beta_os.3[i] ~ dnorm(0.0, 0.1)
+    beta_os.3[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
-  eta_3 ~ dexp(0.5)
+  eta_3 ~ dexp(eta.prior)
 
 
-  alpha_3 ~ dexp(1)
-  alpha_os.3 ~ dexp(1)
+  alpha_3 ~ dexp(alpha.prior)
+  alpha_os.3 ~ dexp(alpha.prior)
 
 
-  sigma_os.3 ~ dnorm(0, 1) T(0,)
-  sigma_nl.3 ~ dnorm(0, 1) T(0,)
+  sigma_os.3 ~ dnorm(0, b.prior.sd) T(0,)
+  sigma_nl.3 ~ dnorm(0, b.prior.sd) T(0,)
 
 
 
@@ -707,11 +707,11 @@ model{
 
   #### priors ####
 
-  alpha_os.4 ~ dexp(1)
+  alpha_os.4 ~ dexp(alpha.prior)
 
   for (i in 1:Npar)
   {
-    beta_os.4[i] ~ dnorm(0.0, 0.1)
+    beta_os.4[i] ~ dnorm(0.0, beta.prior.sd)
   }
 
 

@@ -15,7 +15,17 @@
 
 osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
                   n.MCMC.chain = 2, no.adapt = 80,
-                  burn.in = 10, MCMC.sample = 100, thin = 10, method = "rjparallel", ...) {
+                  burn.in = 10, MCMC.sample = 100, thin = 10,
+                  method = "rjparallel", beta.prior.sd = 10,
+                  alpha.prior = 1, eta.prior = 0.5,
+                  lambda.prior.sd = 10,
+                  b.prior.sd = 1, y.prior.sd = 1, ...) {
+
+  beta.prior.sd = 1/(beta.prior.sd)^2
+  lambda.prior.sd = 1/(lambda.prior.sd)^2
+  b.prior.sd = 1/(b.prior.sd)^2
+  y.prior.sd = 1/(y.prior.sd)^2
+
   N <- nrow(data)
   delta_NL <- data$delta_NL
   delta_NT <- data$delta_NT
@@ -37,7 +47,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   evl_time_colno <- stringr::str_detect(colnames(data), "evl_time.t")
   t <- data[evl_time_colno]
 
-
   evl_times <- ncol(Y)
   t.os <- numeric(N)
   t.cen <- numeric(N)
@@ -49,8 +58,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   p[2] <- Npar + 2
   p[3] <- Npar + 2
   p[4] <- Npar + 1
-
-
 
   for (i in 1:N) {
     if (delta_OS[i] == 1) {
@@ -114,8 +121,18 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   ospred_4JM_file <- tempfile(fileext = ".bug")
   writeLines(ospred_4JM_text(), con = ospred_4JM_file)
 
-  jag.model.name <- ospred_get_posterior_4JM_file
-  # jag.model.name <- "ospred_get_posterior_4JM.bug"
+  bugfile1 = readLines(ospred_get_posterior_4JM_file)
+  bugfile1 = gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile1)
+  bugfile1 = gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile1)
+  bugfile1 = gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile1)
+  bugfile1 = gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile1)
+  bugfile1 = gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile1)
+  bugfile2 = gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile1)
+
+  bugfile2_file = tempfile(fileext = ".bug")
+  writeLines(bugfile2, con = bugfile2_file)
+
+  jag.model.name <- bugfile2_file
   t.cen.lim <- cbind(ifelse(delta_OS == 1, 0, Y_os), rep(longest.survival, length(delta_OS)))
   t.cen.lim.wb.os <- ifelse(t.cen == 0, longest.survival, Y_os)
   t.cen.lim.nl <- cbind(ifelse(delta_NL == 1, 0, Y_3), rep(longest.survival, length(delta_NL))) # cbind(Y_3, rep(longest.survival, length(t.cen)))
@@ -127,7 +144,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   Y.os.t_rep <- Y.os.nl_rep <- Y.os.nt_rep <- Y.os.wb_rep <- ifelse(t.cen == 0, NA, t.cen + 1)
   Y.nl_rep <- ifelse(delta_NL == 1, NA, Y_3 + 1)
   Y.nt_rep <- ifelse(delta_NT == 1, NA, Y_2 + 1)
-
 
   tryCatch({
     posterior_sample <- runjags::run.jags(file.path(jag.model.name),
@@ -145,8 +161,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
         y.lim_t = y.lim_t,
         y.lim_t.os = y.lim_t.os,
         y.lim_nt.os = y.lim_nt.os,
-        # y.lim_nt = y.lim_nt,
-        # y.lim_nl = y.lim_nl,
         y.lim_nl.os = y.lim_nl.os,
         y.lim_wb = y.lim_wb,
         y.lim_wb.os = y.lim_wb.os,
@@ -166,8 +180,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
           Y.os.t_rep = ifelse(is.na(Y.os.t_rep), 1, Y.os.t_rep),
           Y.os.nl_rep = ifelse(is.na(Y.os.nl_rep), 1, Y.os.nl_rep),
           Y.os.nt_rep = ifelse(is.na(Y.os.nt_rep), 1, Y.os.nt_rep),
-          # Y.nl_rep = Y.nl_rep,
-          # Y.nt_rep = Y.nt_rep,
           t.os = Y.os.t_rep,
           t.os.wb = Y.os.t_rep,
           Y.os.wb_rep = ifelse(is.na(Y.os.wb_rep), 1, Y.os.wb_rep)
@@ -187,74 +199,9 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
         "sigma_b1", "sigma_b2", "rho"
       ),
       sample = MCMC.sample,
-      method = method, ...
+      method = method
     )
   })
-
-  #     jag <- rjags::jags.model(file.path(jag.model.name),
-  #       data = list(
-  #         N = N,
-  #         Npar_0 = Npar_0,
-  #         Npar = Npar,
-  #         X = X,
-  #         Z_1 = Z_1,
-  #         Z_2 = Z_2,
-  #         t.os = t.os,
-  #         t.os.wb = t.os,
-  #         t.cen.lim = t.cen.lim,
-  #         t.cen.lim.wb.os = t.cen.lim.wb.os,
-  #         y.lim_t = y.lim_t,
-  #         y.lim_t.os = y.lim_t.os,
-  #         y.lim_nt.os = y.lim_nt.os,
-  #         # y.lim_nt = y.lim_nt,
-  #         # y.lim_nl = y.lim_nl,
-  #         y.lim_nl.os = y.lim_nl.os,
-  #         y.lim_wb = y.lim_wb,
-  #         y.lim_wb.os = y.lim_wb.os,
-  #         t = t,
-  #         T = T,
-  #         Y = Y,
-  #         Y_os = Y_os,
-  #         Y_2 = Y_2,
-  #         Y_3 = Y_3,
-  #         delta_NT = delta_NT,
-  #         delta_NL = delta_NL,
-  #         delta_OS = delta_OS,
-  #         evl_times = evl_times
-  #       ),
-  #       inits <- function() {
-  #         list(
-  #           Y.os.t_rep = ifelse(is.na(Y.os.t_rep), 1, Y.os.t_rep),
-  #           Y.os.nl_rep = ifelse(is.na(Y.os.nl_rep), 1, Y.os.nl_rep),
-  #           Y.os.nt_rep = ifelse(is.na(Y.os.nt_rep), 1, Y.os.nt_rep),
-  #           # Y.nl_rep = Y.nl_rep,
-  #           # Y.nt_rep = Y.nt_rep,
-  #           t.os = Y.os.t_rep,
-  #           t.os.wb = Y.os.t_rep,
-  #           Y.os.wb_rep = ifelse(is.na(Y.os.wb_rep), 1, Y.os.wb_rep)
-  #         )
-  #       },
-  #       n.chains = n.MCMC.chain, n.adapt = no.adapt
-  #     )
-  #     update(jag, burn.in)
-  #
-  #     posterior_sample <- rjags::coda.samples(jag,
-  #       c(
-  #         "beta_0", "beta_1", "lambda", "alpha_os.1", "eta_2",
-  #         "alpha_2", "beta_2", "alpha_os.2", "beta_os.2", "eta_3",
-  #         "alpha_3", "beta_3", "alpha_os.3", "beta_os.3",
-  #         "alpha_os.4", "beta_os.4",
-  #         "Y.os.t_rep", "Y.os.nl_rep", "Y.os.nt_rep", "Y.os.wb_rep",
-  #         "sigma_os.3", "sigma_os.2", "sigma_os.1",
-  #         "sigma_b1", "sigma_b2", "rho"
-  #       ),
-  #       n.iter = MCMC.sample, thin = thin
-  #     )
-  #   },
-  #   warning = function(war) {},
-  #   error = function(err) {},
-  #   finally = {}
-  # )
 
   out_post <- summary(posterior_sample)
 
@@ -300,8 +247,18 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   mg4 <- out_post[c(beta_os.4_name, c("alpha_os.4")), "Median"]
   seg4 <- out_post[c(beta_os.4_name, c("alpha_os.4")), "SD"]
 
-  jag.model.name <- ospred_4JM_file
-  # jag.model.name <- "ospred_4JM.bug"
+  bugfile3 = readLines(ospred_4JM_file)
+  bugfile3 = gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile3)
+  bugfile3 = gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile3)
+  bugfile3 = gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile3)
+  bugfile3 = gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile3)
+  bugfile3 = gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile3)
+  bugfile4 = gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile3)
+
+  bugfile4_file = tempfile(fileext = ".bug")
+  writeLines(bugfile4, con = bugfile4_file)
+
+  jag.model.name <- bugfile4_file
   t.cen.lim <- cbind(ifelse(delta_OS == 1, 0, Y_os), rep(longest.survival, length(delta_OS)))
   t.cen.lim.wb.os <- ifelse(t.cen == 0, longest.survival, Y_os)
   t.cen.lim.nl <- cbind(ifelse(delta_NL == 1, 0, Y_3), rep(longest.survival, length(delta_NL))) # cbind(Y_3, rep(longest.survival, length(t.cen)))
@@ -313,7 +270,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   Y.os.t_rep <- Y.os.nl_rep <- Y.os.nt_rep <- Y.os.wb_rep <- ifelse(t.cen == 0, NA, t.cen + 1)
   Y.nl_rep <- ifelse(delta_NL == 1, NA, Y_3 + 1)
   Y.nt_rep <- ifelse(delta_NT == 1, NA, Y_2 + 1)
-  # Y.os.t_rep = Y.os.nl_rep = Y.os.wb_rep = Y.nl_rep = t.cen + 1
 
   tryCatch({
     posterior_sample <- runjags::run.jags(file.path(jag.model.name),
@@ -331,8 +287,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
         y.lim_t = y.lim_t,
         y.lim_t.os = y.lim_t.os,
         y.lim_nt.os = y.lim_nt.os,
-        # y.lim_nt = y.lim_nt,
-        # y.lim_nl = y.lim_nl,
         y.lim_nl.os = y.lim_nl.os,
         y.lim_wb = y.lim_wb,
         y.lim_wb.os = y.lim_wb.os,
@@ -361,8 +315,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
           Y.os.t_rep = ifelse(is.na(Y.os.t_rep), 1, Y.os.t_rep),
           Y.os.nl_rep = ifelse(is.na(Y.os.nl_rep), 1, Y.os.nl_rep),
           Y.os.nt_rep = ifelse(is.na(Y.os.nt_rep), 1, Y.os.nt_rep),
-          # Y.nl_rep = Y.nl_rep,
-          # Y.nt_rep = Y.nt_rep,
           t.os = Y.os.t_rep,
           t.os.wb = Y.os.t_rep,
           Y.os.wb_rep = ifelse(is.na(Y.os.wb_rep), 1, Y.os.wb_rep)
@@ -386,81 +338,6 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
       method = method, ...
     )
   })
-  #     jag <- rjags::jags.model(file.path(jag.model.name),
-  #       data = list(
-  #         N = N,
-  #         Npar_0 = Npar_0,
-  #         Npar = Npar,
-  #         X = X,
-  #         Z_1 = Z_1,
-  #         Z_2 = Z_2,
-  #         t.os = t.os,
-  #         t.os.wb = t.os,
-  #         t.cen.lim = t.cen.lim,
-  #         t.cen.lim.wb.os = t.cen.lim.wb.os,
-  #         y.lim_t = y.lim_t,
-  #         y.lim_t.os = y.lim_t.os,
-  #         y.lim_nt.os = y.lim_nt.os,
-  #         # y.lim_nt = y.lim_nt,
-  #         # y.lim_nl = y.lim_nl,
-  #         y.lim_nl.os = y.lim_nl.os,
-  #         y.lim_wb = y.lim_wb,
-  #         y.lim_wb.os = y.lim_wb.os,
-  #         t = t,
-  #         T = T,
-  #         Y = Y,
-  #         Y_os = Y_os,
-  #         Y_2 = Y_2,
-  #         Y_3 = Y_3,
-  #         delta_NT = delta_NT,
-  #         delta_NL = delta_NL,
-  #         delta_OS = delta_OS,
-  #         evl_times = evl_times,
-  #         mg1 = mg1,
-  #         seg1 = seg1,
-  #         mg2 = mg2,
-  #         seg2 = seg2,
-  #         mg3 = mg3,
-  #         seg3 = seg3,
-  #         mg4 = mg4,
-  #         seg4 = seg4,
-  #         p = p
-  #       ),
-  #       inits <- function() {
-  #         list(
-  #           Y.os.t_rep = ifelse(is.na(Y.os.t_rep), 1, Y.os.t_rep),
-  #           Y.os.nl_rep = ifelse(is.na(Y.os.nl_rep), 1, Y.os.nl_rep),
-  #           Y.os.nt_rep = ifelse(is.na(Y.os.nt_rep), 1, Y.os.nt_rep),
-  #           # Y.nl_rep = Y.nl_rep,
-  #           # Y.nt_rep = Y.nt_rep,
-  #           t.os = Y.os.t_rep,
-  #           t.os.wb = Y.os.t_rep,
-  #           Y.os.wb_rep = ifelse(is.na(Y.os.wb_rep), 1, Y.os.wb_rep)
-  #         )
-  #       },
-  #       n.chains = n.MCMC.chain, n.adapt = no.adapt
-  #     )
-  #
-  #     update(jag, burn.in)
-  #
-  #     posterior_sample <- rjags::coda.samples(jag,
-  #       c(
-  #         "beta_0", "beta_1", "lambda", "alpha_os.1", "eta_2",
-  #         "alpha_2", "beta_2", "alpha_os.2", "beta_os.2", "eta_3",
-  #         "alpha_3", "beta_3", "alpha_os.3", "beta_os.3",
-  #         "alpha_os.4", "beta_os.4",
-  #         "Y.os.t_rep", "Y.os.nl_rep", "Y.os.nt_rep", "Y.os.wb_rep",
-  #         "sigma_os.3", "sigma_os.2", "sigma_os.1",
-  #         "sigma_b1", "sigma_b2", "rho",
-  #         "Y.mix_rep", "w"
-  #       ),
-  #       n.iter = MCMC.sample, thin = thin
-  #     )
-  #   },
-  #   warning = function(war) {},
-  #   error = function(err) {},
-  #   finally = {}
-  # )
 
   JM_sample <- list(
     "posterior_sample" = posterior_sample$mcmc,
@@ -516,7 +393,8 @@ plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...)
       combine = TRUE,
       xlab = "Months",
       ylab = "Overall survival probability",
-      legend.labs = c("trt1", "trt2")
+      legend.labs = c("trt1", "trt2"),
+      title = "Kaplan-Meier Curve of Overall Survival"
     )
   } else if (type == "date") {
     # the nth death plot
@@ -528,18 +406,15 @@ plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...)
     )
     data_plot <- data[order(data$date), ]
     data_plot$death <- seq(1, length(object$prediction), 1)
-    # p <- ggplot(data_plot, aes(death, date, colour = trt, text = paste("rand.date:", rand_date, "\nID:", ID))) +
-    #   geom_point()
-    # plotly::ggplotly(p)
 
     g <- ggplot(data_plot, aes(colour = trt, text = paste("ID:", ID, "\ndeath:", death, "\nrand.date:", rand_date, "\ndeath.date:", date))) +
-      geom_linerange(data = data_plot, mapping = aes(x = death, ymin = rand_date, ymax = date), size = 1) +
+      geom_linerange(data = data_plot, mapping = aes(x = death, ymin = rand_date, ymax = date)) +
       ylab("time") +
       ggtitle("Patients' Survival Timeline")
-    # geom_point(data=d, mapping=aes(x=drink, y=mean), size=4, shape=21, fill="white") +
-    # opts(title="geom_linerange", plot.title=theme_text(size=40, vjust=1.5))
+
     plotly::ggplotly(g, tooltip = "text")
   } else {
+    # predicted date range plot
     data <- data.frame(
       "date" = data.table::fifelse(object$OS[, 2] == 1, object$OS[, 1] * 30 + object$rand_date, as.Date(object$prediction_date)),
       "lower_bound" = object$quantile[, 1],
