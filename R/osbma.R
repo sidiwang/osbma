@@ -1,17 +1,40 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Install Package:           'Cmd + Shift + B'
-#   Check Package:             'Cmd + Shift + E'
-#   Test Package:              'Cmd + Shift + T'
+#' Prediction of overall survival through Bayesian model averaging
+#'
+#' This function improves the accuracy of the OS forecast by combining joint
+#' models developed based on each granular component of PFS through Bayesian
+#' model averaging.
+#'
+#' @param data
+#' @param covariate
+#' @param longest.survival
+#' @param n.MCMC.chain
+#' @param no.adapt
+#' @param burn.in
+#' @param MCMC.sample
+#' @param thin
+#' @param method
+#' @param beta.prior.sd
+#' @param alpha.prior
+#' @param eta.prior
+#' @param lambda.prior.sd
+#' @param b.prior.sd
+#' @param y.prior.sd
+#' @param ...
+#'
+#' @details
+#' @return
+#' \item{}{}
+#'
+#' @importFrom ggplot2
+#'
+#' @examples
+#' @references
+#'
+#' @seealso
+#'
+#'
+#' @rdname osbma
+#' @export
 
 osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
                   n.MCMC.chain = 2, no.adapt = 80,
@@ -20,11 +43,10 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
                   alpha.prior = 1, eta.prior = 0.5,
                   lambda.prior.sd = 10,
                   b.prior.sd = 1, y.prior.sd = 1, ...) {
-
-  beta.prior.sd = 1/(beta.prior.sd)^2
-  lambda.prior.sd = 1/(lambda.prior.sd)^2
-  b.prior.sd = 1/(b.prior.sd)^2
-  y.prior.sd = 1/(y.prior.sd)^2
+  beta.prior.sd <- 1 / (beta.prior.sd)^2
+  lambda.prior.sd <- 1 / (lambda.prior.sd)^2
+  b.prior.sd <- 1 / (b.prior.sd)^2
+  y.prior.sd <- 1 / (y.prior.sd)^2
 
   N <- nrow(data)
   delta_NL <- data$delta_NL
@@ -121,15 +143,15 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   ospred_4JM_file <- tempfile(fileext = ".bug")
   writeLines(ospred_4JM_text(), con = ospred_4JM_file)
 
-  bugfile1 = readLines(ospred_get_posterior_4JM_file)
-  bugfile1 = gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile1)
-  bugfile1 = gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile1)
-  bugfile1 = gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile1)
-  bugfile1 = gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile1)
-  bugfile1 = gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile1)
-  bugfile2 = gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile1)
+  bugfile1 <- readLines(ospred_get_posterior_4JM_file)
+  bugfile1 <- gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile1)
+  bugfile1 <- gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile1)
+  bugfile1 <- gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile1)
+  bugfile1 <- gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile1)
+  bugfile1 <- gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile1)
+  bugfile2 <- gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile1)
 
-  bugfile2_file = tempfile(fileext = ".bug")
+  bugfile2_file <- tempfile(fileext = ".bug")
   writeLines(bugfile2, con = bugfile2_file)
 
   jag.model.name <- bugfile2_file
@@ -199,7 +221,8 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
         "sigma_b1", "sigma_b2", "rho"
       ),
       sample = MCMC.sample,
-      method = method
+      method = method,
+      ...
     )
   })
 
@@ -247,15 +270,15 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   mg4 <- out_post[c(beta_os.4_name, c("alpha_os.4")), "Median"]
   seg4 <- out_post[c(beta_os.4_name, c("alpha_os.4")), "SD"]
 
-  bugfile3 = readLines(ospred_4JM_file)
-  bugfile3 = gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile3)
-  bugfile3 = gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile3)
-  bugfile3 = gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile3)
-  bugfile3 = gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile3)
-  bugfile3 = gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile3)
-  bugfile4 = gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile3)
+  bugfile3 <- readLines(ospred_4JM_file)
+  bugfile3 <- gsub(pattern = "beta.prior.sd", replacement = beta.prior.sd, x = bugfile3)
+  bugfile3 <- gsub(pattern = "alpha.prior", replacement = alpha.prior, x = bugfile3)
+  bugfile3 <- gsub(pattern = "eta.prior", replacement = eta.prior, x = bugfile3)
+  bugfile3 <- gsub(pattern = "lambda.prior.sd", replacement = lambda.prior.sd, x = bugfile3)
+  bugfile3 <- gsub(pattern = "y.prior.sd", replacement = y.prior.sd, x = bugfile3)
+  bugfile4 <- gsub(pattern = "b.prior.sd", replacement = b.prior.sd, x = bugfile3)
 
-  bugfile4_file = tempfile(fileext = ".bug")
+  bugfile4_file <- tempfile(fileext = ".bug")
   writeLines(bugfile4, con = bugfile4_file)
 
   jag.model.name <- bugfile4_file
@@ -350,6 +373,16 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   return(JM_sample)
 }
 
+#' overall survival prediction
+#'
+#' `predict` method for class "`osbma`"
+#'
+#' @param object
+#' @param quantile
+#' @param ...
+#'
+#' @returns
+#' @export
 
 
 predict.osbma <- function(object, quantile, ...) {
@@ -373,7 +406,15 @@ predict.osbma <- function(object, quantile, ...) {
   obj
 }
 
-
+#' plot based on prediction outcomes of an osbma object
+#'
+#' @param object
+#' @param trt.col.name
+#' @param type
+#' @param ...
+#'
+#' @returns
+#' @export
 plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...) {
   if (type == "KM") {
     # KM plot
