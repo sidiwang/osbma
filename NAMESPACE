@@ -2,4 +2,8 @@
 
 S3method(plot,predict.osbma)
 S3method(predict,osbma)
+S3method(print,osbma)
+S3method(summary,osbma)
 export(osbma)
+import(ggplot2)
+import(runjags)

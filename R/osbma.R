@@ -4,34 +4,65 @@
 #' models developed based on each granular component of PFS through Bayesian
 #' model averaging.
 #'
-#' @param data
-#' @param covariate
-#' @param longest.survival
-#' @param n.MCMC.chain
-#' @param no.adapt
-#' @param burn.in
-#' @param MCMC.sample
-#' @param thin
-#' @param method
-#' @param beta.prior.sd
-#' @param alpha.prior
-#' @param eta.prior
-#' @param lambda.prior.sd
-#' @param b.prior.sd
-#' @param y.prior.sd
-#' @param ...
+#' @param data trial dataset with progression-free survival info (measurements
+#'  of target lesions, time to non-target lesion, time to new lesion, time to
+#'  death), covaraites, patient ID, randomization date, etc. Please see
+#'  \code{\link{data}} for more detailed descriptions.
+#' @param covariate a vector of column names of all the covariates.
+#' @param longest.survival the longest possible survival of a patient in this
+#'  trial. Users can find the longest survival time in a similar trial and multiply
+#'  that number by 2. Default is set as 20 years.
+#' @param n.MCMC.chain number of MCMC chains, default to 2.
+#' @param no.adapt the number of iterations for adaptation.
+#' @param burn.in number of burin-in iterations for MCMC.
+#' @param MCMC.sample number of iterations for MCMC.
+#' @param thin thinning interval for monitors.
+#' @param method same as the `method` argument in \code{\link[runjags]{run.jags}},
+#'  the method with which to call JAGS; probably a character vector specifying
+#'  one of 'rjags', 'simple', 'interruptible', 'parallel', 'rjparallel',
+#'  'background', 'bgparallel' or 'snow'. The 'rjags' and 'rjparallel' methods
+#'  run JAGS using the rjags package, whereas other options do not require the
+#'  rjags package and call JAGS as an external executable.
+#' @param beta.prior.sd the standard deviation of the normal priors of all betas
+#'  (coefficient of covariates)
+#' @param alpha.prior the rate of the exponential priors of all alphas (the shape
+#'  parameter)
+#' @param eta.prior the rate of the exponential priors of all etas (correlations
+#'  in the Clayton copula)
+#' @param lambda.prior.sd the standard deviation of the normal priors of all
+#'  lambdas
+#' @param b.prior.sd the standard deviation of the normal priors of all random
+#'  effects `b`
+#' @param y.prior.sd the standard deviation of the normal prior of Y (the observed
+#'  lesion measurement)
+#' @param ... optional arguments that are passed to \code{runjags::run.jags()}
+#'  function.
 #'
-#' @details
+#' @import ggplot2
+#' @import runjags
+#'
 #' @return
-#' \item{}{}
+#' \item{posterior_sample}{an \code{runjags} object generated through the \code{runjags::run.jags}
+#'    function, which includes posterior samples of all the parameters and predicted
+#'    survival times}
+#' \item{rand_date}{the randomization dates of patients}
+#' \item{covariate}{the covariates columns of the input dataset}
+#' \item{OS}{the overall survival and its censored status provided in the input
+#'    dataset}
+#' \item{ID}{the patient ID}
 #'
-#' @importFrom ggplot2
 #'
 #' @examples
+#' \donttest{
+#'  result = osbma(osbma::data, covariate = "trt")
+#' }
+#'
 #' @references
-#'
+#' (manuscript under review)
 #' @seealso
-#'
+#' \code{\link{predict.osbma}} \cr
+#' \code{\link{plot.predict.osbma}} \cr
+#' \code{\link[runjags]{run.jags}}
 #'
 #' @rdname osbma
 #' @export
@@ -373,15 +404,53 @@ osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
   return(JM_sample)
 }
 
+#' Summarizing osbma fits
+#'
+#' `summary` method for class "`osbma`"
+#'
+#' @param object an object of class "`osbma`", usually, a result of a call to
+#'  \code{\link{osbma}}
+#' @param ... further arguments included in the \link[runjags]{summary.runjags} function.
+#'
+#' @returns
+#' The summary method returns a numeric matrix of summary statistics for each
+#' variable. Please check \code{\link[runjags]{summary.runjags}} for more
+#' details.
+#'
+#' @rdname osbma
+#' @export
+summary.osbma = function(object, ...){
+  s_return = summary(object$posterior_sample, ...)
+  return(s_return)
+}
+
+#' @rdname osbma
+#' @param x `osbma` object to print
+#' @param ... further arguments. Not currently used.
+#' @export
+
+print.osbma = function(x, ...){
+  print(x$posterior_sample)
+}
 #' overall survival prediction
 #'
 #' `predict` method for class "`osbma`"
 #'
-#' @param object
-#' @param quantile
-#' @param ...
+#' @param object an object of class "`osbma`", usually, a result of a call to
+#'  \code{\link{osbma}}
+#' @param quantile the quantile of the predicted overall survival
+#' @param ... further arguments. Not currently used
 #'
 #' @returns
+#' \item{prediction}{the predicted overall survival based on \code{osbma} fit}
+#' \item{prediction_date}{the death date predicted by the \code{osbma} model}
+#' \item{quantile}{the quantile specified by the user}
+#' \item{covariate}{the columns of covariates provided in the input dataset}
+#' \item{rand_date}{the randomization date of the patients in the trial}
+#' \item{OS}{the overall survival and its censored status provided in the input
+#'    dataset}
+#' \item{ID}{the ID of the patients provided in the input dataset}
+#' @rdname osbma
 #' @export
 
 
@@ -408,17 +477,23 @@ predict.osbma <- function(object, quantile, ...) {
 
 #' plot based on prediction outcomes of an osbma object
 #'
-#' @param object
-#' @param trt.col.name
-#' @param type
-#' @param ...
+#' @param x an object of class "`predict.osbma`", usually, a result of a call to
+#'  \code{\link{predict.osbma}}
+#' @param trt.col.name the name of the assigned treatment column, default to `trt`
+#' @param type type of plot the users want: "date" generates a plot with patients'
+#'  survival timeline; "KM" generates a Kaplan-Meier curve of overall survival;
+#'  a number n between 0 - N, where N is the total number of patients enrolled,
+#'  generates a plot of the estimated time of the nth death in the trial.
+#' @param ... further arguments. Not currently used.
 #'
 #' @returns
+#' 3 types of plots
+#' @rdname osbma
 #' @export
-plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...) {
+plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
   if (type == "KM") {
     # KM plot
-    data <- as.data.frame(cbind(ifelse(object$OS[, 2] == 0, object$prediction, object$OS[, 1]), object$covariate[, trt.col.name]))
+    data <- as.data.frame(cbind(ifelse(x$OS[, 2] == 0, x$prediction, x$OS[, 1]), x$covariate[, trt.col.name]))
     colnames(data) <- c("os", "trt")
     trt1 <- subset(data, trt == 1)
     trt2 <- subset(data, trt == 2)
@@ -440,13 +515,13 @@ plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...)
   } else if (type == "date") {
     # the nth death plot
     data <- data.frame(
-      "date" = data.table::fifelse(object$OS[, 2] == 1, object$OS[, 1] * 30 + object$rand_date, as.Date(object$prediction_date)),
-      "trt" = as.factor(object$covariate[, trt.col.name]),
-      "rand_date" = object$rand_date,
-      "ID" = object$ID
+      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] * 30 + x$rand_date, as.Date(x$prediction_date)),
+      "trt" = as.factor(x$covariate[, trt.col.name]),
+      "rand_date" = x$rand_date,
+      "ID" = x$ID
     )
     data_plot <- data[order(data$date), ]
-    data_plot$death <- seq(1, length(object$prediction), 1)
+    data_plot$death <- seq(1, length(x$prediction), 1)
 
     g <- ggplot(data_plot, aes(colour = trt, text = paste("ID:", ID, "\ndeath:", death, "\nrand.date:", rand_date, "\ndeath.date:", date))) +
       geom_linerange(data = data_plot, mapping = aes(x = death, ymin = rand_date, ymax = date)) +
@@ -457,15 +532,15 @@ plot.predict.osbma <- function(object, trt.col.name = "trt", type = "date", ...)
   } else {
     # predicted date range plot
     data <- data.frame(
-      "date" = data.table::fifelse(object$OS[, 2] == 1, object$OS[, 1] * 30 + object$rand_date, as.Date(object$prediction_date)),
-      "lower_bound" = object$quantile[, 1],
-      "upper_bound" = object$quantile[, 2],
-      "trt" = as.factor(object$covariate[, trt.col.name]),
-      "rand_date" = object$rand_date,
-      "ID" = object$ID
+      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] * 30 + x$rand_date, as.Date(x$prediction_date)),
+      "lower_bound" = x$quantile[, 1],
+      "upper_bound" = x$quantile[, 2],
+      "trt" = as.factor(x$covariate[, trt.col.name]),
+      "rand_date" = x$rand_date,
+      "ID" = x$ID
     )
     data_plot <- data[order(data$date), ]
-    data_plot$death <- seq(1, length(object$prediction), 1)
+    data_plot$death <- seq(1, length(x$prediction), 1)
     death.number <- as.integer(type)
 
     q <- ggplot(
