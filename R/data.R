@@ -1,6 +1,7 @@
 #' Oncology trial cutoff data
 #'
-#' sample dataset of an oncology trial with cutoff at any time point
+#' sample dataset of an oncology trial with cutoff at any time point. In total
+#' 400 patients are included.
 #' @name data
 #' @usage data
 #' @format This data frame contains the following columns:

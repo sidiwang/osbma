@@ -8,8 +8,7 @@ Authors@R: c(
     person("Satrajit", "Roychoudhury", , "Satrajit.Roychoudhury@pfizer.com", role = "aut"),
     person("Sidi", "Wang", , "sidiwang@umich.edu", role = "cre")) 
 Maintainer: Sidi Wang <sidiwang@umich.edu>
-Description: Predict overall survival in solid tumor oncology studies using 
-    joint models combined through Bayesian model averaging. 
+Description: Predict overall survival in solid tumor oncology studies using joint models combined through Bayesian model averaging. 
 Depends: 
     R (>= 3.5.0),
     ggplot2,

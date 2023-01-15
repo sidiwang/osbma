@@ -31,7 +31,7 @@ osbma(
 
 \method{print}{osbma}(x, ...)
 
-\method{predict}{osbma}(object, quantile, ...)
+\method{predict}{osbma}(object, quantile = 0.9, ...)
 
 \method{plot}{predict.osbma}(x, trt.col.name = "trt", type = "date", ...)
 }

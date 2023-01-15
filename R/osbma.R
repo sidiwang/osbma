@@ -454,7 +454,7 @@ print.osbma = function(x, ...){
 #' @export
 
 
-predict.osbma <- function(object, quantile, ...) {
+predict.osbma <- function(object, quantile = 0.9, ...) {
   JM_median <- summary(object$posterior_sample)$quantiles[, 3]
   pred_col_JM <- stringr::str_detect(names(JM_median), "Y.mix_rep")
   pred_OS_JM <- JM_median[pred_col_JM]
