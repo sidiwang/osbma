@@ -68,8 +68,8 @@
 #' @export
 
 osbma <- function(data, covariate, longest.survival = 365 * 20 / 30,
-                  n.MCMC.chain = 2, no.adapt = 80,
-                  burn.in = 10, MCMC.sample = 100, thin = 10,
+                  n.MCMC.chain = 2, no.adapt = 8000,
+                  burn.in = 1000, MCMC.sample = 1000, thin = 10,
                   method = "rjparallel", beta.prior.sd = 10,
                   alpha.prior = 1, eta.prior = 0.5,
                   lambda.prior.sd = 10,
