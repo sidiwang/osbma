@@ -1,6 +1,5 @@
 ---
 output: github_document
-always_allow_html: true
 ---
 
 # snSMART
@@ -38,7 +37,8 @@ library(osbma)
 We call the `osbma` function using data from an oncology trial with 400 total individuals. 
 ```{r}
 data <- osbma::data
-result <- osbma::osbma(data = data, covariate = "trt", method = "rjags", MCMC.sample = 100)
+result <- osbma::osbma(data = data, covariate = "trt", method = "rjags")
+options(max.print = 40)
 summary(result)
 ```
 `predict.osbma`:
@@ -54,13 +54,12 @@ plot(prediction, trt.col.name = "trt", type = "KM")
 ```
 - the patients' survival timeline of the trial
 ```{r}
-plot(prediction, trt.col.name = "trt", type = "date")
+# plot(prediction, trt.col.name = "trt", type = "date")
 ```
 - the estimated time of the nth death in the trial (here we use the 120th death as an example)
 ```{r}
-plot(prediction, trt.col.name = "trt", type = 120)
+# plot(prediction, trt.col.name = "trt", type = 120)
 ```
 
 
-## References
 
