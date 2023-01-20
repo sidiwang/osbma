@@ -1,5 +1,5 @@
 
-# snSMART
+# osbma
 
 <!-- badges: start -->
 
