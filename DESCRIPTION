@@ -12,7 +12,7 @@ Description: Predict overall survival in solid tumor oncology studies using join
 Depends: 
     R (>= 3.5.0),
     ggplot2,
-    runjags
+    runjags,
     rjags
 Imports:
     coda,
