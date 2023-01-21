@@ -137,19 +137,16 @@ overall survival of all patients:
 prediction <- predict(result)
 ```
 
-`plot.predict.osbma`: The plot function provides 3 types of plots: + the
-Kaplan-Meier curve of overall survival
+`plot.predict.osbma`: The plot function provides 3 types of plots: 
+- the Kaplan-Meier curve of overall survival
 
 ``` r
 plot(prediction, trt.col.name = "trt", type = "KM")
 ```
 
-    ## Warning: `select_()` was deprecated in dplyr 0.7.0.
-    ## ℹ Please use `select()` instead.
-    ## ℹ The deprecated feature was likely used in the dplyr package.
-    ##   Please report the issue at <]8;;https://github.com/tidyverse/dplyr/issueshttps://github.com/tidyverse/dplyr/issues]8;;>.
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> 
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> + the
+- the
 patients’ survival timeline of the trial
 
 ``` r
