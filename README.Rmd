@@ -48,15 +48,15 @@ prediction <- predict(result)
 ```
 `plot.predict.osbma`:
 The plot function provides 3 types of plots:
-+ the Kaplan-Meier curve of overall survival
+* the Kaplan-Meier curve of overall survival
 ```{r}
 plot(prediction, trt.col.name = "trt", type = "KM")
 ```
-+ the patients' survival timeline of the trial
+* the patients' survival timeline of the trial
 ```{r}
 # plot(prediction, trt.col.name = "trt", type = "date")
 ```
-+ the estimated time of the nth death in the trial (here we use the 120th death as an example)
+* the estimated time of the nth death in the trial (here we use the 120th death as an example)
 ```{r}
 # plot(prediction, trt.col.name = "trt", type = 120)
 ```

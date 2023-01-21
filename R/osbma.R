@@ -571,3 +571,4 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
     plotly::ggplotly(q, tooltip = "text")
   }
 }
+
