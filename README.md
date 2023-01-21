@@ -105,29 +105,29 @@ summary(result)
     ##    plus standard error of the mean:
     ## 
     ##                         Mean        SD  Naive SE Time-series SE
-    ## beta_0[1]          4.425e+01 9.995e-01 2.235e-02      1.090e-01
-    ## beta_0[2]         -3.238e-01 8.461e-02 1.892e-03      7.784e-03
-    ## beta_1[1]          4.658e+00 1.242e-01 2.778e-03      1.351e-02
-    ## beta_1[2]         -1.171e+00 7.172e-02 1.604e-03      7.647e-03
-    ## lambda             5.669e-03 6.753e-04 1.510e-05      3.477e-05
-    ## alpha_os.1         2.690e+00 2.525e-01 5.646e-03      1.460e-02
-    ## eta_2              2.113e-01 1.151e-04 2.573e-06      0.000e+00
-    ## alpha_2            1.279e-01 2.242e-02 5.013e-04      0.000e+00
-    ## beta_2[1]         -2.806e-03 2.596e-03 5.805e-05      0.000e+00
-    ## beta_2[2]         -1.320e-02 2.609e-03 5.834e-05      0.000e+00
+    ## beta_0[1]          4.436e+01 1.029e+00 2.301e-02      1.067e-01
+    ## beta_0[2]         -3.182e-01 7.797e-02 1.744e-03      7.116e-03
+    ## beta_1[1]          4.661e+00 1.134e-01 2.536e-03      1.073e-02
+    ## beta_1[2]         -1.171e+00 6.402e-02 1.431e-03      5.896e-03
+    ## lambda             5.613e-03 6.633e-04 1.483e-05      3.391e-05
+    ## alpha_os.1         2.688e+00 2.522e-01 5.640e-03      1.539e-02
+    ## eta_2              2.275e-01 1.680e-02 3.757e-04      0.000e+00
+    ## alpha_2            1.070e-01 7.044e-04 1.575e-05      1.664e-08
+    ## beta_2[1]         -2.102e-02 2.001e-02 4.473e-04      0.000e+00
+    ## beta_2[2]         -7.082e-02 6.951e-02 1.554e-03      0.000e+00
     ##  [ reached getOption("max.print") -- omitted 2023 rows ]
     ## 
     ## 2. Quantiles for each variable:
     ## 
     ##                         2.5%         25%         50%         75%       97.5%
-    ## beta_0[1]          4.236e+01   4.353e+01   4.423e+01   4.495e+01   4.621e+01
-    ## beta_0[2]         -4.914e-01  -3.796e-01  -3.242e-01  -2.680e-01  -1.496e-01
-    ## beta_1[1]          4.386e+00   4.576e+00   4.661e+00   4.747e+00   4.881e+00
-    ## beta_1[2]         -1.303e+00  -1.221e+00  -1.173e+00  -1.126e+00  -1.022e+00
-    ## lambda             4.401e-03   5.198e-03   5.652e-03   6.135e-03   6.971e-03
-    ## alpha_os.1         2.274e+00   2.513e+00   2.668e+00   2.846e+00   3.213e+00
-    ## eta_2              2.112e-01   2.112e-01   2.113e-01   2.114e-01   2.114e-01
-    ## alpha_2            1.055e-01   1.055e-01   1.279e-01   1.504e-01   1.504e-01
+    ## beta_0[1]          4.228e+01   4.370e+01   4.434e+01   4.503e+01   4.642e+01
+    ## beta_0[2]         -4.816e-01  -3.684e-01  -3.163e-01  -2.636e-01  -1.738e-01
+    ## beta_1[1]          4.457e+00   4.580e+00   4.657e+00   4.739e+00   4.885e+00
+    ## beta_1[2]         -1.296e+00  -1.216e+00  -1.169e+00  -1.126e+00  -1.050e+00
+    ## lambda             4.309e-03   5.191e-03   5.609e-03   6.036e-03   6.995e-03
+    ## alpha_os.1         2.248e+00   2.511e+00   2.671e+00   2.840e+00   3.253e+00
+    ## eta_2              2.107e-01   2.107e-01   2.275e-01   2.443e-01   2.443e-01
+    ## alpha_2            1.063e-01   1.063e-01   1.070e-01   1.077e-01   1.077e-01
     ##  [ reached getOption("max.print") -- omitted 2025 rows ]
 
 `predict.osbma`: Here, we call the prediction function to predict the
@@ -137,7 +137,7 @@ overall survival of all patients:
 prediction <- predict(result)
 ```
 
-`plot.predict.osbma`: The plot function provides 3 types of plots: - the
+`plot.predict.osbma`: The plot function provides 3 types of plots: + the
 Kaplan-Meier curve of overall survival
 
 ``` r
@@ -149,7 +149,7 @@ plot(prediction, trt.col.name = "trt", type = "KM")
     ## ℹ The deprecated feature was likely used in the dplyr package.
     ##   Please report the issue at <]8;;https://github.com/tidyverse/dplyr/issueshttps://github.com/tidyverse/dplyr/issues]8;;>.
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> - the
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> + the
 patients’ survival timeline of the trial
 
 ``` r
@@ -162,3 +162,7 @@ patients’ survival timeline of the trial
 ``` r
 # plot(prediction, trt.col.name = "trt", type = 120)
 ```
+
+As `.md` file doesn’t show interactive plots, please check file
+`demo.Rmd` for the last two plots. Please download `demo.Rmd` and view
+it in browser.

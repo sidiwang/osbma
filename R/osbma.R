@@ -507,6 +507,8 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
     survminer::ggsurvplot(
       fit,
       combine = TRUE,
+      conf.int = TRUE,
+      risk.table = "abs_pct",
       xlab = "Months",
       ylab = "Overall survival probability",
       legend.labs = c("trt1", "trt2"),
