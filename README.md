@@ -161,4 +161,5 @@ patients’ survival timeline of the trial
 ```
 
 As `.md` file doesn’t show interactive plots, please check webpage 
-[https://sidiwang.net/osbmapage/](https://sidiwang.net/osbmapage/)
+[https://sidiwang.net/osbmapage/](https://sidiwang.net/osbmapage/) 
+for the last two plots.
