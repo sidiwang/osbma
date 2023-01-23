@@ -57,7 +57,7 @@ library(osbma)
 
 ## Example
 
-`osbma`: We call the `osbma` function using data from an oncology trial
+`osbma`: We call the `osbma` function using simulated data from an oncology trial
 with 400 total individuals.
 
 ``` r
