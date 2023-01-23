@@ -160,6 +160,5 @@ patients’ survival timeline of the trial
 # plot(prediction, trt.col.name = "trt", type = 120)
 ```
 
-As `.md` file doesn’t show interactive plots, please check file
-`demo.Rmd` for the last two plots. Please download `demo.Rmd` and view
-it in browser.
+As `.md` file doesn’t show interactive plots, please check webpage 
+[https://sidiwang.net/osbmapage/](https://sidiwang.net/osbmapage/)
