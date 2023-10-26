@@ -54,6 +54,7 @@
 #' @examples
 #' \donttest{
 #' result <- osbma(osbma::data, covariate = "trt")
+#' pred <- predict(result)
 #' }
 #'
 #' @references
