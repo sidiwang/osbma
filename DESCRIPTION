@@ -1,0 +1,31 @@
+Package: osbma
+Type: Package
+Title: Overall Survival Prediction through Bayesian Model Averaging
+Version: 0.1.0
+Authors@R: c(
+    person("Sidi", "Wang", , "sidiwang@umich.edu", role = "aut"),
+    person("Kelley", "Kidwell", , "kidwell@umich.edu", role = "aut"),
+    person("Satrajit", "Roychoudhury", , "Satrajit.Roychoudhury@pfizer.com", role = "aut"),
+    person("Sidi", "Wang", , "sidiwang@umich.edu", role = "cre")) 
+Maintainer: Sidi Wang <sidiwang@umich.edu>
+Description: Predict overall survival in solid tumor oncology studies using joint models combined through Bayesian model averaging. 
+Depends: 
+    R (>= 3.5.0),
+    ggplot2,
+    runjags,
+    rjags
+Imports:
+    coda,
+    data.table,
+    plotly,
+    stringr,
+    survival,
+    survminer
+License: GPL-2
+URL: https://github.com/sidiwang/osbma
+BugReports: https://github.com/sidiwang/osbma/issues
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+SystemRequirements: JAGS 4.x.y
