@@ -140,15 +140,17 @@ overall survival of all patients:
 prediction <- predict(result)
 ```
 
-`plot.predict.osbma`: The plot function provides 3 types of plots: \*
-the Kaplan-Meier curve of overall survival
+`plot.predict.osbma`: The plot function provides 3 types of plots: 
+
+\* the Kaplan-Meier curve of overall survival
 
 ``` r
 plot(prediction, trt.col.name = "trt", type = "KM")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> \* the
-patients’ survival timeline of the trial
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> 
+
+\* the patients’ survival timeline of the trial
 
 ``` r
 # plot(prediction, trt.col.name = "trt", type = "date")
