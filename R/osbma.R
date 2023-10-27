@@ -468,10 +468,10 @@ print.osbma <- function(x, ...) {
 
 
 predict.osbma <- function(object, quantile = 0.9, ...) {
-  JM_median <- summary(object$posterior_sample)$quantiles[, 3]
-  pred_col_JM <- stringr::str_detect(names(JM_median), "Y.mix_rep")
-  pred_OS_JM <- JM_median[pred_col_JM]
-  pred_OS_JM_date <- pred_OS_JM * 30 + object$rand_date
+  JM_mean <- summary(object$posterior_sample)$statistics[, 1]
+  pred_col_JM <- stringr::str_detect(names(JM_mean), "Y.mix_rep")
+  pred_OS_JM <- JM_mean[pred_col_JM]
+  pred_OS_JM_date <- pred_OS_JM * 365 + object$rand_date
   JM_quantile <- coda::HPDinterval(object$posterior_sample,
     prob = quantile
   )[[1]][pred_col_JM, ]
@@ -506,16 +506,15 @@ predict.osbma <- function(object, quantile = 0.9, ...) {
 plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
   if (type == "KM") {
     # KM plot
-    data <- as.data.frame(cbind(ifelse(x$OS[, 2] == 0, x$prediction, x$OS[, 1]), x$covariate[, trt.col.name]))
+    data <- as.data.frame(cbind(ifelse(x$OS[, 2] == 0, x$prediction * 365, x$OS[, 1]), x$covariate[, trt.col.name]))
     colnames(data) <- c("os", "trt")
-    trt1 <- subset(data, trt == 1)
-    trt2 <- subset(data, trt == 2)
 
     # Time to death for OS
     fit <- survival::survfit(survival::Surv(os, rep(1, nrow(data))) ~ trt, data = data)
 
     survminer::ggsurvplot(
       fit,
+      data = data,
       combine = TRUE,
       conf.int = TRUE,
       risk.table = FALSE,
@@ -527,21 +526,22 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
       font.y = c(14, "bold", "black"),
       font.tickslab = c(12, "plain", "black"),
       palette = c("#9CCB86", "#009392"),
-      xlab = "Months",
+      xlab = "Days",
+      legend.title = "Treatment",
       ylab = "Overall survival probability",
       legend.labs = c("trt1", "trt2"),
-      title = "Kaplan-Meier Curve of Overall Survival"
+      title = "Kaplan-Meier Curve of Predicted Overall Survival"
     )
   } else if (type == "date") {
     # the nth death plot
     data <- data.frame(
-      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] * 30 + x$rand_date, as.Date(x$prediction_date)),
+      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] + x$rand_date, as.Date(x$prediction_date)),
       "trt" = as.factor(x$covariate[, trt.col.name]),
       "rand_date" = x$rand_date,
       "ID" = x$ID
     )
     data_plot <- data[order(data$date), ]
-    data_plot$death <- seq(1, length(x$prediction), 1)
+    data_plot$death <- seq(1, length(x$prediction * 365), 1)
 
     g <- ggplot(data_plot, aes(colour = trt, text = paste("ID:", ID, "\ndeath:", death, "\nrand.date:", rand_date, "\ndeath.date:", date))) +
       geom_linerange(data = data_plot, mapping = aes(x = death, ymin = rand_date, ymax = date)) +
@@ -552,7 +552,7 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
   } else {
     # predicted date range plot
     data <- data.frame(
-      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] * 30 + x$rand_date, as.Date(x$prediction_date)),
+      "date" = data.table::fifelse(x$OS[, 2] == 1, x$OS[, 1] + x$rand_date, as.Date(x$prediction_date)),
       "lower_bound" = x$quantile[, 1],
       "upper_bound" = x$quantile[, 2],
       "trt" = as.factor(x$covariate[, trt.col.name]),
@@ -560,7 +560,7 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
       "ID" = x$ID
     )
     data_plot <- data[order(data$date), ]
-    data_plot$death <- seq(1, length(x$prediction), 1)
+    data_plot$death <- seq(1, length(x$prediction * 365), 1)
     death.number <- as.integer(type)
 
     q <- ggplot(
@@ -570,12 +570,12 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
         "\ndeath:", death,
         "\nrand.date:", rand_date,
         "\ndeath.date:", date,
-        "\nlower.bound:", lower_bound * 30 + rand_date,
-        "\nupper.bound:", upper_bound * 30 + rand_date
+        "\nlower.bound:", lower_bound * 365 + rand_date,
+        "\nupper.bound:", upper_bound * 365 + rand_date
       ))
     ) +
       geom_linerange(
-        data = data_plot[death.number, ], mapping = aes(x = death.number, ymin = lower_bound * 30 + rand_date, ymax = upper_bound * 30 + rand_date),
+        data = data_plot[death.number, ], mapping = aes(x = death.number, ymin = lower_bound * 365 + rand_date, ymax = upper_bound * 365 + rand_date),
         size = 1, color = "blue"
       ) +
       geom_point(
