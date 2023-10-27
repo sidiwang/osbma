@@ -512,16 +512,21 @@ plot.predict.osbma <- function(x, trt.col.name = "trt", type = "date", ...) {
     trt2 <- subset(data, trt == 2)
 
     # Time to death for OS
-    fit1 <- survival::survfit(survival::Surv(os, rep(1, nrow(trt1))) ~ 1, data = trt1)
-    fit2 <- survival::survfit(survival::Surv(os, rep(1, nrow(trt2))) ~ 1, data = trt2)
-
-    fit <- list(trt_1 = fit1, trt_2 = fit2)
+    fit <- survival::survfit(survival::Surv(os, rep(1, nrow(data))) ~ trt, data = data)
 
     survminer::ggsurvplot(
       fit,
       combine = TRUE,
       conf.int = TRUE,
-      risk.table = "abs_pct",
+      risk.table = FALSE,
+      pval = FALSE,
+      surv.median.line = c("hv"),
+      ggtheme = theme_bw(),
+      font.main = c(16, "bold", "darkblue"),
+      font.x = c(14, "bold", "black"),
+      font.y = c(14, "bold", "black"),
+      font.tickslab = c(12, "plain", "black"),
+      palette = c("#9CCB86", "#009392"),
       xlab = "Months",
       ylab = "Overall survival probability",
       legend.labs = c("trt1", "trt2"),
